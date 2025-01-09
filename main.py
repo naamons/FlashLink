@@ -63,10 +63,6 @@ if st.session_state['identified']:
     st.subheader("🚙 Vehicle Information")
     vehicle_info = {
         "**VIN**": "1HGCM82633A004352",
-        "**Make**": "Tricorn",
-        "**Model**": "X-Turbo",
-        "**Year**": "2023",
-        "**Engine Type**": "2.0L Turbocharged I4"
     }
     for key, value in vehicle_info.items():
         st.write(f"{key}: {value}")
@@ -81,22 +77,12 @@ if st.session_state['identified']:
     for key, value in ecu_info.items():
         st.write(f"{key}: {value}")
 
-    st.subheader("📡 Sensor Statuses")
-    sensor_statuses = {
-        "**O2 Sensor 1**": "Active",
-        "**O2 Sensor 2**": "Active",
-        "**MAP Sensor**": "Active",
-        "**Throttle Position Sensor**": "Active",
-        "**Mass Air Flow Sensor**": "Active",
-        "**Engine Coolant Temperature Sensor**": "Active"
-    }
     for key, value in sensor_statuses.items():
         st.write(f"{key}: {value}")
 
     st.subheader("💾 Memory Information")
     memory_info = {
-        "**Flash Memory Size**": "512 KB",
-        "**RAM Size**": "128 KB",
+        "**Flash Memory Size**": "2056 KB",
         "**EEPROM Status**": "Healthy"
     }
     for key, value in memory_info.items():
@@ -105,9 +91,6 @@ if st.session_state['identified']:
     st.subheader("🔌 Connectivity")
     connectivity_info = {
         "**CAN Bus**": "Connected",
-        "**LIN Bus**": "Connected",
-        "**FlexRay**": "Not Available",
-        "**OBD-II Port**": "Available"
     }
     for key, value in connectivity_info.items():
         st.write(f"{key}: {value}")
