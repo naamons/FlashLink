@@ -3,7 +3,8 @@ import time
 
 # Set the page configuration
 st.set_page_config(
-    page_title="FlashLink",
+    page_title="🔧 TriCore ECU Reader/Writer",
+    page_icon="🔌",
     layout="centered",
     initial_sidebar_state="auto",
 )
@@ -20,103 +21,125 @@ if 'backup_completed' not in st.session_state:
 
 # Function to simulate identification process
 def identify_vehicle():
-    with st.spinner('Identifying vehicle...'):
+    with st.spinner('🔄 Identifying ECU...'):
         time.sleep(3)  # Simulate time delay
     st.session_state['identified'] = True
+
+# Function to simulate ECU reading process
+def read_ecu():
+    st.session_state['reading_started'] = True
+    reading_log_placeholder = st.empty()
+    progress_bar = st.progress(0)
+    steps = [
+        "Initializing TriCore ECU interface...",
+        "Establishing communication protocols...",
+        "Reading sector 1/2...",
+        "Sector 1/2 read successfully.",
+        "Reading sector 2/2...",
+        "Sector 2/2 read successfully.",
+        "Verifying data integrity...",
+        "Data integrity verified.",
+        "Resetting ECU interface...",
+        "ECU reset successfully.",
+        "Reading complete."
+    ]
+    total_steps = len(steps)
+    log = ">>> TriCore ECU Read Log\n"
+    reading_log_placeholder.text(f"```python\n{log}```")
+    
+    for i, step in enumerate(steps, 1):
+        # Update log
+        log += f"{step}\n"
+        reading_log_placeholder.text(f"```python\n{log}```")
+        # Update progress bar
+        progress = i / total_steps
+        progress_bar.progress(progress)
+        time.sleep(1)  # Simulate time delay for each step
+    st.session_state['reading_completed'] = True
 
 # Function to simulate ECU backup process
 def make_backup():
     st.session_state['backup_started'] = True
-    with st.spinner('Initiating ECU Backup...'):
+    with st.spinner('💾 Making ECU Backup...'):
         steps = [
-            "Establishing communication with ECU",
-            "Authenticating ECU modules",
-            "Reading Vehicle Identification Number (VIN)",
-            "Retrieving ECU Serial Number",
-            "Fetching Firmware and Hardware Versions",
-            "Scanning Sensor Statuses",
-            "Reading Flash Memory",
-            "Reading RAM Data",
-            "Verifying EEPROM Status",
-            "Extracting Communication Protocols",
-            "Logging Diagnostic Trouble Codes (DTCs)",
-            "Verifying Data Integrity",
-            "Finalizing Backup Process"
+            "🔄 Establishing communication with ECU",
+            "🔄 Authenticating ECU modules",
+            "🔄 Reading Vehicle Identification Number (VIN)",
+            "🔄 Retrieving ECU Serial Number",
+            "🔄 Fetching Firmware and Hardware Versions",
+            "🔄 Scanning Sensor Statuses",
+            "🔄 Reading Flash Memory",
+            "🔄 Reading RAM Data",
+            "🔄 Verifying EEPROM Status",
+            "🔄 Extracting Communication Protocols",
+            "🔄 Logging Diagnostic Trouble Codes (DTCs)",
+            "🔄 Verifying Data Integrity",
+            "🔄 Finalizing Backup Process"
         ]
         for step in steps:
-            st.write(f"🔄 {step}...")
+            st.write(step)
             time.sleep(1)  # Simulate time delay for each step
         st.session_state['backup_completed'] = True
 
 # App Title
-st.title("FlashLink")
+st.title("🔌 TriCore ECU Reader/Writer App")
 
 # Identify Vehicle Section
-if not st.session_state['identified']:
-    st.header("🔍 Step 1: Identify Vehicle")
-    if st.button("Identify Vehicle"):
+if not st.session_state.get('identified', False):
+    st.header("🔍 Step 1: Identify ECU")
+    if st.button("Identify ECU"):
         identify_vehicle()
 
 # Display Identification Success with Detailed Information
-if st.session_state['identified']:
+if st.session_state.get('identified', False):
     st.success("✅ Identification Success")
-    st.subheader("🚙 Vehicle Information")
-    vehicle_info = {
-        "**VIN**": "1HGCM82633A004352",
-    }
-    for key, value in vehicle_info.items():
-        st.write(f"{key}: {value}")
-
-    st.subheader("🛠️ ECU Information")
+    st.subheader("🔧 ECU Information")
     ecu_info = {
+        "**VIN**": "1HGCM82633A004352",
         "**ECU Serial Number**": "ECU123456789",
         "**Firmware Version**": "FW v2.5.1",
         "**Hardware Version**": "HW Rev A3",
-        "**Communication Protocols**": "CAN, LIN, FlexRay"
+        "**Calibration**": "CNNFJM___TAA",
+        "**Availability**": "Read/Write"
     }
     for key, value in ecu_info.items():
         st.write(f"{key}: {value}")
 
-    for key, value in sensor_statuses.items():
-        st.write(f"{key}: {value}")
+    # TriCore ECU Reading Section
+    if not st.session_state.get('reading_completed', False):
+        st.header("📂 Step 2: Read ECU")
+        if st.button("Read ECU"):
+            read_ecu()
 
-    st.subheader("💾 Memory Information")
-    memory_info = {
-        "**Flash Memory Size**": "2056 KB",
-        "**EEPROM Status**": "Healthy"
-    }
-    for key, value in memory_info.items():
-        st.write(f"{key}: {value}")
+    # Display Reading Process
+    if st.session_state.get('reading_started', False) and not st.session_state.get('reading_completed', False):
+        st.info("🔄 Reading ECU data... Please wait.")
 
-    st.subheader("🔌 Connectivity")
-    connectivity_info = {
-        "**CAN Bus**": "Connected",
-    }
-    for key, value in connectivity_info.items():
-        st.write(f"{key}: {value}")
+    # Display Reading Completion
+    if st.session_state.get('reading_completed', False):
+        st.success("✅ ECU Reading Complete!")
 
-    # Make ECU Backup Section
-    if not st.session_state['backup_completed']:
-        st.header("💾 Step 2: Make ECU Backup")
-        if st.button("Make ECU Backup"):
-            make_backup()
+        # Make ECU Backup Section
+        if not st.session_state.get('backup_completed', False):
+            st.header("💾 Step 3: Make ECU Backup")
+            if st.button("Make ECU Backup"):
+                make_backup()
 
-    # Display Backup Process
-    if st.session_state['backup_started'] and not st.session_state['backup_completed']:
-        st.info("🔄 Backup in progress... Please wait.")
+        # Display Backup Process
+        if st.session_state.get('backup_started', False) and not st.session_state.get('backup_completed', False):
+            st.info("💾 Backup in progress... Please wait.")
 
-    # Display Backup Completion
-    if st.session_state['backup_completed']:
-        st.success("✅ Backup saved successfully!")
-        if st.button("📤 Send information to tuner?"):
-            with st.spinner('Sending data to tuner...'):
-                time.sleep(2)  # Simulate sending time
-            st.info("📨 Information sent to tuner successfully!")
+        # Display Backup Completion
+        if st.session_state.get('backup_completed', False):
+            st.success("✅ Backup saved successfully!")
+            if st.button("📤 Send information to tuner?"):
+                with st.spinner('📡 Sending data to tuner...'):
+                    time.sleep(2)  # Simulate sending time
+                st.info("📨 Information sent to tuner successfully!")
 
 # Optional: Reset functionality
 st.sidebar.header("⚙️ Controls")
 if st.sidebar.button("🔄 Reset App"):
-    st.session_state['identified'] = False
-    st.session_state['backup_started'] = False
-    st.session_state['backup_completed'] = False
+    for key in ['identified', 'reading_started', 'reading_completed', 'backup_started', 'backup_completed']:
+        st.session_state[key] = False
     st.experimental_rerun()
