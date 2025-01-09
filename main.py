@@ -49,7 +49,7 @@ def make_backup():
         st.session_state['backup_completed'] = True
 
 # App Title
-st.title("🔧 Tricorn ECU Reader/Writer App")
+st.title("FlashLink")
 
 # Identify Vehicle Section
 if not st.session_state['identified']:
