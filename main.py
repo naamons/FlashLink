@@ -3,7 +3,7 @@ import time
 
 # Set the page configuration
 st.set_page_config(
-    page_title="🔧 TriCore ECU Reader/Writer",
+    page_title="FlashLink: TriCore ECU Reader/Writer",
     page_icon="🔌",
     layout="centered",
     initial_sidebar_state="auto",
@@ -13,6 +13,12 @@ st.set_page_config(
 if 'identified' not in st.session_state:
     st.session_state['identified'] = False
 
+if 'reading_started' not in st.session_state:
+    st.session_state['reading_started'] = False
+
+if 'reading_completed' not in st.session_state:
+    st.session_state['reading_completed'] = False
+
 if 'backup_started' not in st.session_state:
     st.session_state['backup_started'] = False
 
@@ -20,7 +26,7 @@ if 'backup_completed' not in st.session_state:
     st.session_state['backup_completed'] = False
 
 # Function to simulate identification process
-def identify_vehicle():
+def identify_ecu():
     with st.spinner('🔄 Identifying ECU...'):
         time.sleep(3)  # Simulate time delay
     st.session_state['identified'] = True
@@ -45,12 +51,42 @@ def read_ecu():
     ]
     total_steps = len(steps)
     log = ">>> TriCore ECU Read Log\n"
-    reading_log_placeholder.text(f"```python\n{log}```")
+    
+    # Define CSS for the scrollable log area
+    scrollable_style = """
+    <style>
+    .scrollable-log {
+        height: 300px;
+        overflow-y: scroll;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+    </style>
+    """
+    st.markdown(scrollable_style, unsafe_allow_html=True)
+    
+    # Initialize the scrollable log
+    reading_log_placeholder.markdown(f"""
+    <div class="scrollable-log">
+    ```python
+    {log}
+    ```
+    </div>
+    """, unsafe_allow_html=True)
     
     for i, step in enumerate(steps, 1):
         # Update log
         log += f"{step}\n"
-        reading_log_placeholder.text(f"```python\n{log}```")
+        reading_log_placeholder.markdown(f"""
+        <div class="scrollable-log">
+        ```python
+{log}
+        ```
+        </div>
+        """, unsafe_allow_html=True)
         # Update progress bar
         progress = i / total_steps
         progress_bar.progress(progress)
@@ -82,13 +118,13 @@ def make_backup():
         st.session_state['backup_completed'] = True
 
 # App Title
-st.title("🔌 TriCore ECU Reader/Writer App")
+st.title("🔌 FlashLink: TriCore ECU Reader/Writer App")
 
-# Identify Vehicle Section
+# Identify ECU Section
 if not st.session_state.get('identified', False):
     st.header("🔍 Step 1: Identify ECU")
     if st.button("Identify ECU"):
-        identify_vehicle()
+        identify_ecu()
 
 # Display Identification Success with Detailed Information
 if st.session_state.get('identified', False):
