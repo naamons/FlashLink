@@ -28,7 +28,6 @@ total_duration = sum(step["duration"] for step in steps)  # 60 seconds
 # Function to start the ECU reading process
 def start_process():
     st.session_state['started'] = True
-    st.experimental_rerun()
 
 # Function to reset the app
 def reset_app():
@@ -71,7 +70,7 @@ def main():
             # Simulate step duration
             for second in range(step['duration']):
                 # Calculate progress
-                current_progress = ((idx * step['duration']) + second) / total_duration
+                current_progress = ((idx * step['duration']) + second + 1) / total_duration
                 progress_bar.progress(current_progress)
                 time.sleep(1)
             
@@ -85,7 +84,7 @@ def main():
         # After all steps are completed
         spinner_placeholder.empty()
         progress_placeholder.progress(1.0)
-        st.success("✅ ECU Reading Complete!")
+        step_placeholder.markdown("**✅ ECU Reading Complete!**")
         st.info("📤 Information has been successfully read from the ECU.")
 
 # Run the main function
