@@ -6,75 +6,88 @@ st.set_page_config(
     page_title="FlashLink: TriCore ECU Reader/Writer",
     page_icon="🔌",
     layout="centered",
-    initial_sidebar_state="auto",
 )
 
 # Initialize session state variables
-if 'current_step' not in st.session_state:
-    st.session_state['current_step'] = 1  # Start with Step 1
+if 'started' not in st.session_state:
+    st.session_state['started'] = False
 
-# Define total number of steps
-TOTAL_STEPS = 4
+# Define the steps with their descriptions and durations (in seconds)
+steps = [
+    {"description": "Initializing ECU Interface...", "duration": 10},
+    {"description": "Establishing Communication Protocols...", "duration": 10},
+    {"description": "Reading Sector 1/2...", "duration": 10},
+    {"description": "Reading Sector 2/2...", "duration": 10},
+    {"description": "Verifying Data Integrity...", "duration": 10},
+    {"description": "Resetting ECU Interface...", "duration": 10},
+]
+
+total_steps = len(steps)
+total_duration = sum(step["duration"] for step in steps)  # 60 seconds
+
+# Function to start the ECU reading process
+def start_process():
+    st.session_state['started'] = True
+    st.experimental_rerun()
 
 # Function to reset the app
 def reset_app():
-    st.session_state['current_step'] = 1
+    st.session_state['started'] = False
     st.experimental_rerun()
 
-# Step 1: Identify ECU
-def step_identify_ecu():
-    with st.spinner('🔄 Identifying ECU...'):
-        time.sleep(3)  # Simulate time delay
-    st.session_state['current_step'] = 2
+# Main Application Logic
+def main():
+    st.title("🔌 FlashLink: TriCore ECU Reader/Writer App")
+    
+    # Sidebar Controls
+    st.sidebar.header("⚙️ Controls")
+    if st.sidebar.button("🔄 Reset App"):
+        reset_app()
+    
+    if not st.session_state['started']:
+        st.header("🔍 Step 1: Identify ECU")
+        st.write("Click the button below to start the ECU reading process.")
+        if st.button("Start ECU Reading"):
+            start_process()
+    else:
+        # Placeholders for spinner, progress, and step description
+        spinner_placeholder = st.empty()
+        progress_placeholder = st.empty()
+        step_placeholder = st.empty()
+        
+        # Initialize progress
+        progress_bar = progress_placeholder.progress(0)
+        
+        for idx, step in enumerate(steps):
+            # Display large spinning icon using an emoji with increased font size
+            spinner_placeholder.markdown(
+                f"<div style='font-size:100px;'>🔄</div>",
+                unsafe_allow_html=True
+            )
+            
+            # Update step description
+            step_placeholder.markdown(f"**{step['description']}**")
+            
+            # Simulate step duration
+            for second in range(step['duration']):
+                # Calculate progress
+                current_progress = ((idx * step['duration']) + second) / total_duration
+                progress_bar.progress(current_progress)
+                time.sleep(1)
+            
+            # Update progress to the end of the current step
+            current_progress = ((idx + 1) * step['duration']) / total_duration
+            progress_bar.progress(current_progress)
+            
+            # Clear the step description for the next step
+            step_placeholder.empty()
+        
+        # After all steps are completed
+        spinner_placeholder.empty()
+        progress_placeholder.progress(1.0)
+        st.success("✅ ECU Reading Complete!")
+        st.info("📤 Information has been successfully read from the ECU.")
 
-# Step 2: Read ECU
-def step_read_ecu():
-    st.session_state['current_step'] = 2.1  # Intermediate state for reading
-    reading_log_placeholder = st.empty()
-    progress_bar = st.progress(0)
-    steps = [
-        "Initializing TriCore ECU interface...",
-        "Establishing communication protocols...",
-        "Reading sector 1/2...",
-        "Sector 1/2 read successfully.",
-        "Reading sector 2/2...",
-        "Sector 2/2 read successfully.",
-        "Verifying data integrity...",
-        "Data integrity verified.",
-        "Resetting ECU interface...",
-        "ECU reset successfully.",
-        "Reading complete."
-    ]
-    total_steps = len(steps)
-    log = ">>> TriCore ECU Read Log\n"
-
-    # Define CSS for the scrollable log area and auto-scroll
-    scrollable_style = """
-    <style>
-    .scrollable-log {
-        height: 300px;
-        overflow-y: scroll;
-        background-color: #f5f5f5;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-family: monospace;
-    }
-    </style>
-    <script>
-    function scrollToBottom(id) {
-        var element = document.getElementById(id);
-        element.scrollTop = element.scrollHeight;
-    }
-    </script>
-    """
-    st.markdown(scrollable_style, unsafe_allow_html=True)
-
-    # Unique ID for the log container to target with JavaScript
-    log_container_id = "ecu_read_log"
-
-    # Initialize the scrollable log
-    reading_log_placeholder.markdown(f'''
-<div id="{log_container_id}" class="scrollable-log">
-```python
-{log}
+# Run the main function
+if __name__ == "__main__":
+    main()
