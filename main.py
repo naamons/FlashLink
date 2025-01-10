@@ -74,7 +74,7 @@ def step_read_ecu():
     log_container_id = "ecu_read_log"
 
     # Initialize the scrollable log
-    reading_log_placeholder.markdown(f"""
-    <div id="{log_container_id}" class="scrollable-log">
-    ```python
+    reading_log_placeholder.markdown(f'''
+<div id="{log_container_id}" class="scrollable-log">
+```python
 {log}
