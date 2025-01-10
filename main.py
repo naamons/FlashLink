@@ -36,7 +36,7 @@ def reset_app():
 
 # Main Application Logic
 def main():
-    st.title("🔌 FlashLink: TriCore ECU Reader/Writer App")
+    st.title("🔌 FlashLink")
     
     # Sidebar Controls
     st.sidebar.header("⚙️ Controls")
@@ -44,7 +44,7 @@ def main():
         reset_app()
     
     if not st.session_state['started']:
-        st.header("🔍 Step 1: Identify ECU")
+        st.header("Step 1: Identify ECU")
         st.write("Click the button below to start the ECU reading process.")
         if st.button("Start ECU Reading"):
             start_process()
