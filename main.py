@@ -10,30 +10,26 @@ st.set_page_config(
 )
 
 # Initialize session state variables
-if 'identified' not in st.session_state:
-    st.session_state['identified'] = False
+if 'current_step' not in st.session_state:
+    st.session_state['current_step'] = 1  # Start with Step 1
 
-if 'reading_started' not in st.session_state:
-    st.session_state['reading_started'] = False
+# Define total number of steps
+TOTAL_STEPS = 4
 
-if 'reading_completed' not in st.session_state:
-    st.session_state['reading_completed'] = False
+# Function to reset the app
+def reset_app():
+    st.session_state['current_step'] = 1
+    st.experimental_rerun()
 
-if 'backup_started' not in st.session_state:
-    st.session_state['backup_started'] = False
-
-if 'backup_completed' not in st.session_state:
-    st.session_state['backup_completed'] = False
-
-# Function to simulate identification process
-def identify_ecu():
+# Step 1: Identify ECU
+def step_identify_ecu():
     with st.spinner('🔄 Identifying ECU...'):
         time.sleep(3)  # Simulate time delay
-    st.session_state['identified'] = True
+    st.session_state['current_step'] = 2
 
-# Function to simulate ECU reading process
-def read_ecu():
-    st.session_state['reading_started'] = True
+# Step 2: Read ECU
+def step_read_ecu():
+    st.session_state['current_step'] = 2.1  # Intermediate state for reading
     reading_log_placeholder = st.empty()
     progress_bar = st.progress(0)
     steps = [
@@ -51,7 +47,7 @@ def read_ecu():
     ]
     total_steps = len(steps)
     log = ">>> TriCore ECU Read Log\n"
-    
+
     # Define CSS for the scrollable log area
     scrollable_style = """
     <style>
@@ -67,7 +63,7 @@ def read_ecu():
     </style>
     """
     st.markdown(scrollable_style, unsafe_allow_html=True)
-    
+
     # Initialize the scrollable log
     reading_log_placeholder.markdown(f"""
     <div class="scrollable-log">
@@ -76,7 +72,7 @@ def read_ecu():
     ```
     </div>
     """, unsafe_allow_html=True)
-    
+
     for i, step in enumerate(steps, 1):
         # Update log
         log += f"{step}\n"
@@ -90,92 +86,151 @@ def read_ecu():
         # Update progress bar
         progress = i / total_steps
         progress_bar.progress(progress)
+        # Auto-scroll to bottom
         time.sleep(1)  # Simulate time delay for each step
-    st.session_state['reading_completed'] = True
 
-# Function to simulate ECU backup process
-def make_backup():
-    st.session_state['backup_started'] = True
-    with st.spinner('💾 Making ECU Backup...'):
-        steps = [
-            "🔄 Establishing communication with ECU",
-            "🔄 Authenticating ECU modules",
-            "🔄 Reading Vehicle Identification Number (VIN)",
-            "🔄 Retrieving ECU Serial Number",
-            "🔄 Fetching Firmware and Hardware Versions",
-            "🔄 Scanning Sensor Statuses",
-            "🔄 Reading Flash Memory",
-            "🔄 Reading RAM Data",
-            "🔄 Verifying EEPROM Status",
-            "🔄 Extracting Communication Protocols",
-            "🔄 Logging Diagnostic Trouble Codes (DTCs)",
-            "🔄 Verifying Data Integrity",
-            "🔄 Finalizing Backup Process"
-        ]
-        for step in steps:
-            st.write(step)
-            time.sleep(1)  # Simulate time delay for each step
-        st.session_state['backup_completed'] = True
+    st.session_state['current_step'] = 3  # Move to next step after reading
 
-# App Title
-st.title("🔌 FlashLink: TriCore ECU Reader/Writer App")
+# Step 3: Make ECU Backup
+def step_make_backup():
+    st.session_state['current_step'] = 3.1  # Intermediate state for backup
+    backup_log_placeholder = st.empty()
+    progress_bar = st.progress(0)
+    steps = [
+        "🔄 Establishing communication with ECU",
+        "🔄 Authenticating ECU modules",
+        "🔄 Reading Vehicle Identification Number (VIN)",
+        "🔄 Retrieving ECU Serial Number",
+        "🔄 Fetching Firmware and Hardware Versions",
+        "🔄 Scanning Sensor Statuses",
+        "🔄 Reading Flash Memory",
+        "🔄 Reading RAM Data",
+        "🔄 Verifying EEPROM Status",
+        "🔄 Extracting Communication Protocols",
+        "🔄 Logging Diagnostic Trouble Codes (DTCs)",
+        "🔄 Verifying Data Integrity",
+        "🔄 Finalizing Backup Process"
+    ]
+    total_steps = len(steps)
+    log = ">>> ECU Backup Log\n"
 
-# Identify ECU Section
-if not st.session_state.get('identified', False):
-    st.header("🔍 Step 1: Identify ECU")
-    if st.button("Identify ECU"):
-        identify_ecu()
-
-# Display Identification Success with Detailed Information
-if st.session_state.get('identified', False):
-    st.success("✅ Identification Success")
-    st.subheader("🔧 ECU Information")
-    ecu_info = {
-        "**VIN**": "1HGCM82633A004352",
-        "**ECU Serial Number**": "ECU123456789",
-        "**Firmware Version**": "FW v2.5.1",
-        "**Hardware Version**": "HW Rev A3",
-        "**Calibration**": "CNNFJM___TAA",
-        "**Availability**": "Read/Write"
+    # Define CSS for the scrollable log area
+    scrollable_style = """
+    <style>
+    .scrollable-log {
+        height: 300px;
+        overflow-y: scroll;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-family: monospace;
     }
-    for key, value in ecu_info.items():
-        st.write(f"{key}: {value}")
+    </style>
+    """
+    st.markdown(scrollable_style, unsafe_allow_html=True)
 
-    # TriCore ECU Reading Section
-    if not st.session_state.get('reading_completed', False):
+    # Initialize the scrollable log
+    backup_log_placeholder.markdown(f"""
+    <div class="scrollable-log">
+    ```python
+    {log}
+    ```
+    </div>
+    """, unsafe_allow_html=True)
+
+    for i, step in enumerate(steps, 1):
+        # Update log
+        log += f"{step}\n"
+        backup_log_placeholder.markdown(f"""
+        <div class="scrollable-log">
+        ```python
+{log}
+        ```
+        </div>
+        """, unsafe_allow_html=True)
+        # Update progress bar
+        progress = i / total_steps
+        progress_bar.progress(progress)
+        # Auto-scroll to bottom
+        time.sleep(1)  # Simulate time delay for each step
+
+    st.session_state['current_step'] = 4  # Move to next step after backup
+
+# Step 4: Send Information to Tuner
+def step_send_to_tuner():
+    with st.spinner('📡 Sending data to tuner...'):
+        time.sleep(2)  # Simulate sending time
+    st.session_state['current_step'] = 5  # Completion step
+
+# Main Application Logic
+def main():
+    st.title("🔌 FlashLink: TriCore ECU Reader/Writer App")
+
+    # Step 1: Identify ECU
+    if st.session_state['current_step'] == 1:
+        st.header("🔍 Step 1: Identify ECU")
+        if st.button("Identify ECU"):
+            step_identify_ecu()
+
+    # Step 2: Read ECU
+    elif st.session_state['current_step'] == 2:
+        st.success("✅ Identification Success")
+        st.subheader("🔧 ECU Information")
+        ecu_info = {
+            "**VIN**": "1HGCM82633A004352",
+            "**ECU Serial Number**": "ECU123456789",
+            "**Firmware Version**": "FW v2.5.1",
+            "**Hardware Version**": "HW Rev A3",
+            "**Calibration**": "CNNFJM___TAA",
+            "**Availability**": "Read/Write"
+        }
+        for key, value in ecu_info.items():
+            st.write(f"{key}: {value}")
+
         st.header("📂 Step 2: Read ECU")
         if st.button("Read ECU"):
-            read_ecu()
+            step_read_ecu()
 
-    # Display Reading Process
-    if st.session_state.get('reading_started', False) and not st.session_state.get('reading_completed', False):
+    # Intermediate Step 2.1: Reading ECU (progress and log)
+    elif st.session_state['current_step'] == 2.1:
         st.info("🔄 Reading ECU data... Please wait.")
+        # The reading function handles the UI updates
+        step_read_ecu()
 
-    # Display Reading Completion
-    if st.session_state.get('reading_completed', False):
+    # Step 3: Make ECU Backup
+    elif st.session_state['current_step'] == 3:
         st.success("✅ ECU Reading Complete!")
+        st.header("💾 Step 3: Make ECU Backup")
+        if st.button("Make ECU Backup"):
+            step_make_backup()
 
-        # Make ECU Backup Section
-        if not st.session_state.get('backup_completed', False):
-            st.header("💾 Step 3: Make ECU Backup")
-            if st.button("Make ECU Backup"):
-                make_backup()
+    # Intermediate Step 3.1: Making Backup (progress and log)
+    elif st.session_state['current_step'] == 3.1:
+        st.info("💾 Backup in progress... Please wait.")
+        # The backup function handles the UI updates
+        step_make_backup()
 
-        # Display Backup Process
-        if st.session_state.get('backup_started', False) and not st.session_state.get('backup_completed', False):
-            st.info("💾 Backup in progress... Please wait.")
+    # Step 4: Send Information to Tuner
+    elif st.session_state['current_step'] == 4:
+        st.success("✅ Backup saved successfully!")
+        st.header("📤 Step 4: Send Information to Tuner")
+        if st.button("Send information to tuner?"):
+            step_send_to_tuner()
 
-        # Display Backup Completion
-        if st.session_state.get('backup_completed', False):
-            st.success("✅ Backup saved successfully!")
-            if st.button("📤 Send information to tuner?"):
-                with st.spinner('📡 Sending data to tuner...'):
-                    time.sleep(2)  # Simulate sending time
-                st.info("📨 Information sent to tuner successfully!")
+    # Step 5: Completion
+    elif st.session_state['current_step'] == 5:
+        st.success("✅ ECU Backup and Transmission Complete!")
+        st.info("📨 Information sent to tuner successfully!")
 
-# Optional: Reset functionality
-st.sidebar.header("⚙️ Controls")
-if st.sidebar.button("🔄 Reset App"):
-    for key in ['identified', 'reading_started', 'reading_completed', 'backup_started', 'backup_completed']:
-        st.session_state[key] = False
-    st.experimental_rerun()
+    # Handle unexpected steps
+    else:
+        st.error("An unexpected error occurred. Please reset the app.")
+
+    # Reset Button in Sidebar
+    st.sidebar.header("⚙️ Controls")
+    if st.sidebar.button("🔄 Reset App"):
+        reset_app()
+
+if __name__ == "__main__":
+    main()
