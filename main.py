@@ -3,7 +3,7 @@ import time
 
 # Set the page configuration
 st.set_page_config(
-    page_title="FlashLink",
+    page_title="FlashLink: TriCore ECU Reader/Writer",
     page_icon="🔌",
     layout="centered",
     initial_sidebar_state="auto",
